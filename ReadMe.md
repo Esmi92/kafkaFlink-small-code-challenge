@@ -4,14 +4,7 @@
 Este proyecto integra un productor de Kafka (incluyendo creación de tópicos) y un job de Flink (como consumidor) para enriquecer y almacenar mensajes de notificación.
 
 El flujo funciona así:
-
-- Una API dentro de la misma aplicación recibe una solicitud POST y publica un mensaje en el *Topic* `transactions-events`.
-- Kafka realiza una validación básica y envía el mensaje al *Topic*.
-- El mensaje es consumido por:
-   - Un job de **Flink**, encargado de enriquecerlo con datos provenientes de **MongoDB**.
-   - Una tabla **REALTIME** de **Pinot**, donde se almacena el mensaje crudo tal como lo generó el productor.
-- Si el job de Flink **no encuentra** la cuenta en MongoDB, envía el mensaje al tópico `transactions-dlq`.
-- Si el mensaje sí **es enriquecido**, se envía al tópico `transactions-enriched`, que puede ser consumido por cualquier otro servicio para enviar la notificación final.
+<img width="1355" height="550" alt="Screenshot 2026-02-24 at 12 20 15 p m" src="https://github.com/user-attachments/assets/0152049a-020e-4360-9370-db867ea29cbc" />
 
 ## Requisitos para correr el proyecto
 - Docker Desktop
