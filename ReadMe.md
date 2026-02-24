@@ -75,7 +75,6 @@ Si al ejecutar `docker ps` algún contenedor no está corriendo:
 2. Si terminó con código **137**, probablemente fue por falta de memoria.
 4. Intenta reiniciarlo:
  ```
- docker start <nombre>
- docker-compose up -d <nombre>
+ docker-compose up -d <ContainerName>
  ```
 
