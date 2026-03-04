@@ -39,17 +39,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
       CLUSTER_ID: "esme-cluste-id"
-  topic-init:
-    image: confluentinc/cp-kafka:7.7.0
-    container_name: topic-init
-    depends_on:
-      - kafka
-    command: >
-      bash -c "kafka-topics --create
-      --topic transactions-events
-      --bootstrap-server kafka:9092
-      --partitions 3
-      --replication-factor 1 || echo 'Topic already exists'"
   job:
     build: ./flink-job
     image: demo-flink-job:latest
@@ -80,39 +69,3 @@ services:
       - "27017:27017"
     volumes:
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-  pinot-zookeeper:
-    image: zookeeper:3.8
-    container_name: pinot-zookeeper
-    ports:
-      - "2181:2181"
-  pinot-controller:
-    image: apachepinot/pinot:1.2.0
-    container_name: pinot-controller
-    entrypoint: ["/opt/pinot/bin/pinot-admin.sh"]
-    command: ["StartController", "-zkAddress", "pinot-zookeeper:2181"]
-    ports:
-      - "9000:9000"
-    volumes:
-      - ./pinot-integration:/config
-  pinot-broker:
-    image: apachepinot/pinot:1.2.0
-    container_name: pinot-broker
-    entrypoint: ["/opt/pinot/bin/pinot-admin.sh"]
-    command: ["StartBroker", "-zkAddress", "pinot-zookeeper:2181"]
-    ports:
-      - "8099:8099"
-    depends_on:
-      - pinot-controller
-    volumes:
-      - ./pinot-integration:/config
-  pinot-server:
-    image: apachepinot/pinot:1.2.0
-    container_name: pinot-server
-    entrypoint: ["/opt/pinot/bin/pinot-admin.sh"]
-    command: ["StartServer", "-zkAddress", "pinot-zookeeper:2181"]
-    ports:
-      - "8098:8098"
-    depends_on:
-      - pinot-controller
-    volumes:
-      - ./pinot-integration:/config

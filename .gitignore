@@ -1,0 +1,3 @@
+# Ignore Maven build output directories
+**/target/
+kafkaIBMCloud.json

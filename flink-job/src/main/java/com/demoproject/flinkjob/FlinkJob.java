@@ -18,22 +18,37 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 
 import org.bson.Document;
-import java.time.LocalDate;
 
 import com.fasterxml.jackson.databind.JsonNode; 
 import com.fasterxml.jackson.databind.ObjectMapper; 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.util.Properties;
+
 public class FlinkJob{
+    private static String serialization = "org.apache.kafka.common.serialization.StringSerializer";
+    private static String broker = "";
+    private static String apiKey = "";
+    private static String password = "";
+
     public static void main(String[] args) throws Exception{
+        Properties props = new Properties();
+        props.put("bootstrap.servers", broker);
+        props.put("security.protocol", "SASL_SSL"); 
+        props.put("sasl.mechanism", "PLAIN");
+        props.put("sasl.jaas.config", "org.apache.kafka.common.security.plain.PlainLoginModule required " + "username=\"" + apiKey + "\" " + "password=\"" + password + "\";");
+        props.put("key.serializer", serialization );
+        props.put("value.serializer", serialization );
+
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         KafkaSource<String> source =  KafkaSource.<String>builder()
-        .setBootstrapServers("kafka:9092")
+        .setBootstrapServers(props.getProperty("bootstrap.servers"))
         .setTopics("transactions-events")
         .setGroupId("flink-consumer")
         .setStartingOffsets(OffsetsInitializer.earliest()) 
         .setValueOnlyDeserializer(new SimpleStringSchema())
+        .setProperties(props)
         .build();
 
         KafkaSink<String> transactionSink = KafkaSink.<String>builder()

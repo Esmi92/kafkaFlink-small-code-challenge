@@ -17,9 +17,17 @@ public class RequestHandler{
     private final KafkaProducer<String, String> producer;
     private final ObjectMapper mapper = new ObjectMapper();
     private String serialization = "org.apache.kafka.common.serialization.StringSerializer";
+    private String broker = "";
+    private String apiKey = "";
+    private String password = "";
+
     public RequestHandler(){
+        // this would ususlly by handle by a VCAP_SERVICES, but I going to hardcode for now. 
         Properties props = new Properties();
-        props.put("bootstrap.servers", "kafka:9092");
+        props.put("bootstrap.servers", broker);
+        props.put("security.protocol", "SASL_SSL"); 
+        props.put("sasl.mechanism", "PLAIN");
+        props.put("sasl.jaas.config", "org.apache.kafka.common.security.plain.PlainLoginModule required " + "username=\"" + apiKey + "\" " + "password=\"" + password + "\";");
         props.put("key.serializer", serialization );
         props.put("value.serializer", serialization );
 
